@@ -1,14 +1,15 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
-import { io } from 'socket.io-client';
+import { io, Socket } from 'socket.io-client';
 
 export function useSocket() {
-  const socketRef = useRef(null);
-  const [socketId, setSocketId] = useState(null);
+  const socketRef = useRef<Socket | null>(null);
+  const [socketId, setSocketId] = useState<string | null>(null);
   const [isConnected, setIsConnected] = useState(false);
-  const listenersRef = useRef({});
+  const listenersRef = useRef<Record<string, (...args: any[]) => void>>({});
 
   useEffect(() => {
-    const socketUrl = import.meta.env.VITE_API_URL || window.location.origin;
+    // Determine the socket URL from the environment or use development default
+    const socketUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
     const socket = io(socketUrl, {
       transports: ['websocket', 'polling'],
       reconnection: true,
@@ -19,7 +20,7 @@ export function useSocket() {
     socketRef.current = socket;
 
     socket.on('connect', () => {
-      setSocketId(socket.id);
+      setSocketId(socket.id || null);
       setIsConnected(true);
     });
 
@@ -37,7 +38,7 @@ export function useSocket() {
     };
   }, []);
 
-  const on = useCallback((event, handler) => {
+  const on = useCallback((event: string, handler: (...args: any[]) => void) => {
     const socket = socketRef.current;
     if (!socket) return;
 
@@ -50,7 +51,7 @@ export function useSocket() {
     listenersRef.current[event] = handler;
   }, []);
 
-  const off = useCallback((event) => {
+  const off = useCallback((event: string) => {
     const socket = socketRef.current;
     if (!socket) return;
 
