@@ -86,8 +86,6 @@ export default function ConverterDropzone() {
     <div className="mx-auto flex w-full max-w-5xl flex-col gap-y-6">
       {/* Toast Notification (Simple) */}
       {toastMessage && (
-
-
         <Alert variant={toastMessage.type === 'error' ? 'destructive' : 'success'} className='border-destructive'>
           {toastMessage.type === 'error' ? <AlertCircle className="size-6" /> : <CheckCircle className="size-6" />}
           <AlertTitle className="text-lg">{toastMessage.message}</AlertTitle>
@@ -97,20 +95,22 @@ export default function ConverterDropzone() {
 
       {appState === 'IDLE' ? (
         <>
-          {isConnected
-            && <>
-              <Card
-                className={`group flex min-h-52 w-full flex-col bg-transparent items-center justify-center gap-4 py-8 border-2 border-primary/50 border-dashed text-sm 
-                ${isDragging ? 'border-primary bg-primary/50 hover:bg-primary/50' : ''}
-                ${selectedFiles.length > 0 ? 'bg-primary/10' : ''}
-                transition-colors duration-300
-              `}
-                onDragEnter={handleDragEnter}
-                onDragLeave={handleDragLeave}
-                onDragOver={isConnected ? onDragOver : undefined}
-                onDrop={isConnected ? onDropFiles : undefined}
-                onClick={isConnected ? openFilePicker : undefined}
-              >
+          <Card
+            id="converter-dropzone-card"
+            className={`group flex min-h-52 w-full flex-col bg-transparent items-center justify-center gap-4 py-8 border-2 border-primary/50 border-dashed text-sm 
+            ${isDragging ? 'border-primary bg-primary/50 hover:bg-primary/50' : ''}
+            ${selectedFiles.length > 0 ? 'bg-primary/10' : ''}
+            ${!isConnected ? 'opacity-60 bg-muted/30 cursor-not-allowed border-muted-foreground/30' : 'cursor-pointer'}
+            transition-colors duration-300
+          `}
+            onDragEnter={isConnected ? handleDragEnter : undefined}
+            onDragLeave={isConnected ? handleDragLeave : undefined}
+            onDragOver={isConnected ? onDragOver : undefined}
+            onDrop={isConnected ? onDropFiles : undefined}
+            onClick={isConnected ? openFilePicker : undefined}
+          >
+            {isConnected ? (
+              <>
                 <div className="grid space-y-3">
                   <div className="text-base md:text-lg flex items-center gap-x-2 text-muted-foreground">
                     <Upload className="size-5" />
@@ -121,9 +121,8 @@ export default function ConverterDropzone() {
                         className="text-primary hover:text-primary/90 p-0 text-base md:text-lg h-auto font-normal pointer-events-none"
                         disabled={!isConnected}
                       >
-                        haz clicl para seleccionar
+                        haz clic para seleccionar
                       </Button>{" "}
-
                     </div>
                   </div>
                 </div>
@@ -138,10 +137,18 @@ export default function ConverterDropzone() {
                 />
                 <span className="text-xs md:text-base text-muted-foreground/75 group-disabled:opacity-50 mt-2 block  text-center">
                   Formatos permitidos: <b>MOV (max 500 MB)</b><br />
-
                 </span>
-              </Card>
-            </>}
+              </>
+            ) : (
+              <div className="flex flex-col items-center gap-4 text-muted-foreground">
+                <Loader2 className="size-8 animate-spin text-primary" />
+                <div className="flex flex-col items-center">
+                  <span className="text-base font-medium text-foreground">Conectando al servidor...</span>
+                  <span className="text-sm">Por favor espera un momento</span>
+                </div>
+              </div>
+            )}
+          </Card>
 
 
           {selectedFiles.length > 0 && (

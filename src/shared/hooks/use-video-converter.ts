@@ -42,20 +42,6 @@ export function useVideoConverter() {
   }, [toastMessage]);
 
   useEffect(() => {
-    if (!isConnected) {
-      addToast('Conexión perdida. Reintentando...', 'error');
-      setAppState('IDLE');
-      setFileEntries((prev) =>
-        prev.map((f) =>
-          ['uploading', 'converting'].includes(f.status)
-            ? { ...f, status: 'error' as FileStatus, error: 'Conexión perdida' }
-            : f
-        )
-      );
-    }
-  }, [isConnected, addToast]);
-
-  useEffect(() => {
     const handler = (e: BeforeUnloadEvent) => {
       if (appState === 'UPLOADING' || appState === 'CONVERTING') {
         e.preventDefault();
