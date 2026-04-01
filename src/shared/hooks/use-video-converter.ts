@@ -207,13 +207,12 @@ export function useVideoConverter() {
 
   const handleDownloadAll = useCallback(async () => {
     const completedFiles = fileEntries.filter(
-      (f) => f.status === 'completed' || f.status === 'downloaded'
+      (f) => f.status === 'completed'
     );
 
     if (completedFiles.length === 0) return;
 
     for (const file of completedFiles) {
-      console.log(file);
       await handleDownload(file);
     }
   }, [fileEntries, handleDownload]);
