@@ -5,21 +5,20 @@ export default function DashboardLayout({
   children,
 }: Readonly<{
   children: React.ReactNode
-}>){
-    return  <SidebarProvider>
-      <div className="flex h-dvh w-full">
-        <AppSidebar />
+}>) {
+  return <SidebarProvider>
+    <div className="flex h-dvh w-full">
+      <AppSidebar />
 
-<div className="p-4 w-full h-full flex flex-col gap-2">
-  <header className="flex items-center">
-          <SidebarTrigger className="cursor-pointer"/>
+      <div className="p-4 w-full h-full flex flex-col gap-2">
+        <header className="flex items-center">
+          <SidebarTrigger className="cursor-pointer" />
         </header>
 
-<main className="w-full h-full flex justify-center items-center overflow-auto">
-
-        {children}
-</main>
-</div>
+        <main className="w-full h-full overflow-auto">
+          {children}
+        </main>
       </div>
-    </SidebarProvider>
+    </div>
+  </SidebarProvider>
 }

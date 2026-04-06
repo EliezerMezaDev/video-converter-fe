@@ -3,7 +3,7 @@
 import { Sidebar, SidebarContent, SidebarHeader, SidebarMenu, SidebarMenuItem, SidebarFooter } from "@shadcn/components/ui/sidebar";
 import { ScrollArea } from "@shadcn/components/ui/scroll-area";
 import { NavItem, NavMain } from "@components/nav-main";
-import { Home, Video, HelpCircle } from "lucide-react";
+import { Home, Video, HelpCircle, Music2 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { driver } from "driver.js";
@@ -19,7 +19,13 @@ export const navData: NavItem[] = [
       { title: "Convertidor de video", href: "/d/converter" },
     ],
   },
-
+  {
+    title: "Música",
+    icon: Music2,
+    children: [
+      { title: "Búsqueda de música", href: "/d/music" },
+    ],
+  },
 ];
 
 export function AppSidebar() {
@@ -29,22 +35,13 @@ export function AppSidebar() {
     let steps: any[] = [];
     if (pathname.includes("/d/converter")) {
       steps = [
-        {
-          element: '#converter-module-header',
-          popover: {
-            title: 'Módulo Convertidor',
-            description: 'Aquí puedes convertir tus videos de formato MOV a un formato optimizado.',
-            side: "bottom", align: 'start'
-          }
-        },
-        {
-          element: '#converter-dropzone-card',
-          popover: {
-            title: 'Área de Subida',
-            description: 'Arrastra y suelta tus archivos aquí, o haz clic para seleccionarlos. Requiere estar conectado al servidor.',
-            side: "top", align: 'center'
-          }
-        }
+        { element: '#converter-module-header', popover: { title: 'Módulo Convertidor', description: 'Aquí puedes convertir tus videos de formato MOV a un formato optimizado.', side: "bottom", align: 'start' } },
+        { element: '#converter-dropzone-card', popover: { title: 'Área de Subida', description: 'Arrastra y suelta tus archivos aquí, o haz clic para seleccionarlos.', side: "top", align: 'center' } }
+      ];
+    } else if (pathname.includes("/d/music")) {
+      steps = [
+        { element: '#music-page-header', popover: { title: 'Búsqueda de Música', description: 'Encuentra música libre de derechos de autor desde Pixabay.', side: "bottom", align: 'start' } },
+        { element: '#music-search-input', popover: { title: 'Barra de búsqueda', description: 'Escribe un término o usa los filtros y pulsa Buscar.', side: "bottom", align: 'center' } },
       ];
     } else {
       steps = [

@@ -84,7 +84,7 @@ export default function ConverterDropzone() {
 
 
   return (
-    <div className="mx-auto flex w-full max-w-5xl flex-col gap-y-6">
+    <div className="mx-auto flex w-full h-full flex-col gap-4">
       {/* Toast Notification (Simple) */}
       {toastMessage && (
         <Alert variant={toastMessage.type === 'error' ? 'destructive' : 'success'} className='border-destructive'>
@@ -96,107 +96,110 @@ export default function ConverterDropzone() {
 
       {appState === 'IDLE' ? (
         <>
-          <Card
-            id="converter-dropzone-card"
-            className={`group flex min-h-52 w-full flex-col bg-transparent items-center justify-center gap-4 py-8 border-2 border-primary/50 border-dashed text-sm 
+          <div className={`w-full h-full grid gap-4 ${selectedFiles.length > 0 ? ' grid-cols-1 lg:grid-cols-[1fr_1fr]' : 'grid-cols-1'}`}>
+            <div className="">
+              <Card
+                id="converter-dropzone-card"
+                className={`group flex w-full h-full flex-col bg-transparent items-center justify-center gap-4 py-8 border-2 border-primary/50 border-dashed text-sm 
             ${isDragging ? 'border-primary bg-primary/50 hover:bg-primary/50' : ''}
             ${selectedFiles.length > 0 ? 'bg-primary/10' : ''}
             ${!isConnected ? 'opacity-60 bg-muted/30 cursor-not-allowed border-muted-foreground/30' : 'cursor-pointer'}
             transition-colors duration-300
           `}
-            onDragEnter={isConnected ? handleDragEnter : undefined}
-            onDragLeave={isConnected ? handleDragLeave : undefined}
-            onDragOver={isConnected ? onDragOver : undefined}
-            onDrop={isConnected ? onDropFiles : undefined}
-            onClick={isConnected ? openFilePicker : undefined}
-          >
-            {isConnected ? (
-              <>
-                <div className="grid space-y-3">
-                  <div className="text-base md:text-lg flex items-center gap-x-2 text-muted-foreground">
-                    <Upload className="size-5" />
-                    <div>
-                      Suelta los archivos aquí o{" "}
-                      <Button
-                        variant="link"
-                        className="text-primary hover:text-primary/90 p-0 text-base md:text-lg h-auto font-normal pointer-events-none"
-                        disabled={!isConnected}
-                      >
-                        haz clic para seleccionar
-                      </Button>{" "}
-                    </div>
-                  </div>
-                </div>
-                <input
-                  ref={filePickerRef}
-                  type="file"
-                  className="hidden"
-                  accept="video/quicktime,.mov"
-                  multiple
-                  onChange={onFileInputChange}
-                  disabled={!isConnected}
-                />
-                <span className="text-xs md:text-base text-muted-foreground/75 group-disabled:opacity-50 mt-2 block  text-center">
-                  Formatos permitidos: <b>MOV (max {converterFeatures.fileMaxSize} MB)</b><br />
-                </span>
-              </>
-            ) : (
-              <div className="flex flex-col items-center gap-4 text-muted-foreground">
-                <Loader2 className="size-8 animate-spin text-primary" />
-                <div className="flex flex-col items-center">
-                  <span className="text-base font-medium text-foreground">Conectando al servidor...</span>
-                  <span className="text-sm">Por favor espera un momento</span>
-                </div>
-              </div>
-            )}
-          </Card>
-
-
-          {selectedFiles.length > 0 && (
-            <div className="flex flex-col gap-4">
-              <h2 className="text-balance text-foreground flex items-center font-normal uppercase text-base">
-                <FileText className="mr-1 size-4" />
-                Archivos Seleccionados ({selectedFiles.length})
-              </h2>
-              <ScrollArea className="h-48 w-full">
-                <div className="grid">
-                  {selectedFiles.map((file, i) => <>
-                    <div key={`${file.name}-${i}`} className="p-4 bg-primary/10 hover:bg-primary/20 group flex items-center justify-between gap-2">
-
-                      <div className="grid shrink-0 place-content-center">
-                        <FileText className="inline size-6" />
-                      </div>
-                      <div className="w-full flex justify-between items-center gap-2">
-
-
-                        <span className="text-sm truncate w-2/3">{file.name}</span>
-                        <div className="flex items-center gap-4">
-                          <span className="text-xs font-bold text-muted-foreground">{(file.size / 1024 / 1024).toFixed(2)} MB</span>
-                          <Button variant="ghost" size="icon" onClick={() => handleRemoveFile(file.name)} className="size-6 text-muted-foreground hover:text-red-500 hover:bg-red-50">
-                            <X className="size-4" />
-                          </Button>
+                onDragEnter={isConnected ? handleDragEnter : undefined}
+                onDragLeave={isConnected ? handleDragLeave : undefined}
+                onDragOver={isConnected ? onDragOver : undefined}
+                onDrop={isConnected ? onDropFiles : undefined}
+                onClick={isConnected ? openFilePicker : undefined}
+              >
+                {isConnected ? (
+                  <>
+                    <div className="grid space-y-3">
+                      <div className="text-base md:text-lg flex items-center gap-x-2 text-muted-foreground">
+                        <Upload className="size-5" />
+                        <div>
+                          Suelta los archivos aquí o{" "}
+                          <Button
+                            variant="link"
+                            className="text-primary hover:text-primary/90 p-0 text-base md:text-lg h-auto font-normal pointer-events-none"
+                            disabled={!isConnected}
+                          >
+                            haz clic para seleccionar
+                          </Button>{" "}
                         </div>
                       </div>
                     </div>
-
-                    <Separator className="bg-primary" />
-                  </>)}
-                </div>
-              </ScrollArea>
-
-              <div className="flex justify-end gap-2">
-                <Button size="lg" onClick={handleReset} variant="outline">Limpiar</Button>
-                <Button size="lg" onClick={handleUpload} disabled={!isConnected}>
-                  <Upload className=" size-4" />
-                  Convertir
-                </Button>
-              </div>
+                    <input
+                      ref={filePickerRef}
+                      type="file"
+                      className="hidden"
+                      accept="video/quicktime,.mov"
+                      multiple
+                      onChange={onFileInputChange}
+                      disabled={!isConnected}
+                    />
+                    <span className="text-xs md:text-base text-muted-foreground/75 group-disabled:opacity-50 mt-2 block  text-center">
+                      Formatos permitidos: <b>MOV (max {converterFeatures.fileMaxSize} MB)</b><br />
+                    </span>
+                  </>
+                ) : (
+                  <div className="flex flex-col items-center gap-4 text-muted-foreground">
+                    <Loader2 className="size-8 animate-spin text-primary" />
+                    <div className="flex flex-col items-center">
+                      <span className="text-base font-medium text-foreground">Conectando al servidor...</span>
+                      <span className="text-sm">Por favor espera un momento</span>
+                    </div>
+                  </div>
+                )}
+              </Card>
             </div>
-          )}
+            {selectedFiles.length > 0 &&
+              <div className="">
+                <div className="h-full flex flex-col gap-4">
+                  <div className="flex-1 flex flex-col gap-2">
+                    <h2 className="text-balance text-foreground flex items-center font-normal uppercase text-base">
+                      <FileText className="mr-1 size-4" />
+                      Archivos Seleccionados ({selectedFiles.length})
+                    </h2>
+                  <ScrollArea className="w-full max-h-[calc(100vh-250px)]">
+                    <div className="grid">
+                      {selectedFiles.map((file, i) => <>
+                        <div key={`${file.name}-${i}`} className="p-4 border-b border-primary bg-primary/10 hover:bg-primary/20 group flex items-center justify-between gap-2">
+
+                          <div className="grid shrink-0 place-content-center">
+                            <FileText className="inline size-6" />
+                          </div>
+                          <div className="w-full flex justify-between items-center gap-2">
+                            <span className="text-sm truncate w-2/3">{file.name}</span>
+                            <div className="flex items-center gap-4">
+                              <span className="text-xs font-bold text-muted-foreground">{(file.size / 1024 / 1024).toFixed(2)} MB</span>
+                              <Button variant="ghost" size="icon" onClick={() => handleRemoveFile(file.name)} className="size-6 text-muted-foreground hover:text-red-500 hover:bg-red-50">
+                                <X className="size-4" />
+                              </Button>
+                            </div>
+                          </div>
+                        </div>
+
+                      </>)}
+                    </div>
+                  </ScrollArea>
+                  </div>
+
+
+                  <div className="flex justify-end gap-2">
+                    <Button size="lg" onClick={handleReset} variant="outline">Limpiar</Button>
+                    <Button size="lg" onClick={handleUpload} disabled={!isConnected}>
+                      <Upload className=" size-4" />
+                      Convertir
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            }
+          </div>
         </>
       ) : (
         <div className="flex flex-col gap-y-4">
-
           <div className="flex gap-4 justify-between items-center bg-muted/30 p-4 border">
             <div className="flex flex-col gap-1">
               <span className="text-sm font-medium">Estado: {appState === 'UPLOADING' ? 'Subiendo...' : appState === 'CONVERTING' ? 'Convirtiendo...' : 'Finalizado'}</span>
@@ -218,7 +221,6 @@ export default function ConverterDropzone() {
               )}
             </div>
           </div>
-
 
           {activeEntries.length > 0 && (
             <div className="flex flex-col gap-2">
