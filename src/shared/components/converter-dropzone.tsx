@@ -10,6 +10,7 @@ import { Upload, FileText, X, CheckCircle, Loader2, Download, RefreshCw, AlertCi
 import { ScrollArea } from "../shadcn/components/ui/scroll-area";
 import { useVideoConverter } from "../hooks/use-video-converter";
 import { Alert, AlertDescription, AlertTitle } from "../shadcn/components/ui/alert";
+import { converterFeatures } from "../lib/features";
 
 export default function ConverterDropzone() {
   const {
@@ -136,7 +137,7 @@ export default function ConverterDropzone() {
                   disabled={!isConnected}
                 />
                 <span className="text-xs md:text-base text-muted-foreground/75 group-disabled:opacity-50 mt-2 block  text-center">
-                  Formatos permitidos: <b>MOV (max 500 MB)</b><br />
+                  Formatos permitidos: <b>MOV (max {converterFeatures.fileMaxSize} MB)</b><br />
                 </span>
               </>
             ) : (
