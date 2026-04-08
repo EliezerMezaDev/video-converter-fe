@@ -47,8 +47,6 @@ export default function ConverterDropzone() {
     }
   };
 
-
-
   const handleDragEnter = (event: React.DragEvent) => {
     event.preventDefault();
     event.stopPropagation();
@@ -82,9 +80,8 @@ export default function ConverterDropzone() {
   const activeEntries = fileEntries.filter((f) => ['uploading', 'converting'].includes(f.status));
   const completedEntries = fileEntries.filter((f) => ['completed', 'downloaded', 'error'].includes(f.status));
 
-
   return (
-    <div className="mx-auto flex w-full h-full flex-col gap-4">
+    <div className="w-full flex flex-col gap-4">
       {/* Toast Notification (Simple) */}
       {toastMessage && (
         <Alert variant={toastMessage.type === 'error' ? 'destructive' : 'success'} className='border-destructive'>
@@ -101,10 +98,10 @@ export default function ConverterDropzone() {
               <Card
                 id="converter-dropzone-card"
                 className={`group flex w-full h-full flex-col bg-transparent items-center justify-center gap-4 py-8 border-2 border-primary/50 border-dashed text-sm 
-            ${isDragging ? 'border-primary bg-primary/50 hover:bg-primary/50' : ''}
-            ${selectedFiles.length > 0 ? 'bg-primary/10' : ''}
-            ${!isConnected ? 'opacity-60 bg-muted/30 cursor-not-allowed border-muted-foreground/30' : 'cursor-pointer'}
-            transition-colors duration-300
+                ${isDragging ? 'border-primary bg-primary/50 hover:bg-primary/50' : ''}
+                ${selectedFiles.length > 0 ? 'bg-primary/10' : ''}
+                ${!isConnected ? 'opacity-60 bg-muted/30 cursor-not-allowed border-muted-foreground/30' : 'cursor-pointer'}
+                transition-colors duration-300
           `}
                 onDragEnter={isConnected ? handleDragEnter : undefined}
                 onDragLeave={isConnected ? handleDragLeave : undefined}
@@ -114,14 +111,14 @@ export default function ConverterDropzone() {
               >
                 {isConnected ? (
                   <>
-                    <div className="grid space-y-3">
-                      <div className="text-base md:text-lg flex items-center gap-x-2 text-muted-foreground">
-                        <Upload className="size-5" />
-                        <div>
+                    <div className="grid space-y-3 p-4">
+                      <div className="text-base flex items-center justify-center max-md:flex-col gap-2 text-muted-foreground">
+                        <Upload className="size-8 md:size-5" />
+                        <div className="text-center">
                           Suelta los archivos aquí o{" "}
                           <Button
                             variant="link"
-                            className="text-primary hover:text-primary/90 p-0 text-base md:text-lg h-auto font-normal pointer-events-none"
+                            className="text-primary hover:text-primary/90 p-0 text-base h-auto font-normal pointer-events-none"
                             disabled={!isConnected}
                           >
                             haz clic para seleccionar
@@ -159,32 +156,29 @@ export default function ConverterDropzone() {
                   <div className="flex-1 flex flex-col gap-2">
                     <h2 className="text-balance text-foreground flex items-center font-normal uppercase text-base">
                       <FileText className="mr-1 size-4" />
-                      Archivos Seleccionados ({selectedFiles.length})
+                      Archivos seleccionados ({selectedFiles.length})
                     </h2>
-                  <ScrollArea className="w-full max-h-[calc(100vh-250px)]">
-                    <div className="grid">
-                      {selectedFiles.map((file, i) => <>
-                        <div key={`${file.name}-${i}`} className="p-4 border-b border-primary bg-primary/10 hover:bg-primary/20 group flex items-center justify-between gap-2">
-
-                          <div className="grid shrink-0 place-content-center">
-                            <FileText className="inline size-6" />
-                          </div>
-                          <div className="w-full flex justify-between items-center gap-2">
-                            <span className="text-sm truncate w-2/3">{file.name}</span>
-                            <div className="flex items-center gap-4">
-                              <span className="text-xs font-bold text-muted-foreground">{(file.size / 1024 / 1024).toFixed(2)} MB</span>
-                              <Button variant="ghost" size="icon" onClick={() => handleRemoveFile(file.name)} className="size-6 text-muted-foreground hover:text-red-500 hover:bg-red-50">
-                                <X className="size-4" />
-                              </Button>
+                    <ScrollArea className="w-full max-h-[50dvh] md:max-h-[calc(100dvh-250px)]">
+                      <div className="grid">
+                        {selectedFiles.map((file, i) => <>
+                          <div key={`${file.name}-${i}`} className="p-3 px-4 border-b border-primary/15 overflow-hidden transition-colors duration-200 flex">
+                            <div className="mr-2 grid shrink-0 place-content-center">
+                              <FileText className="inline size-6" />
+                            </div>
+                            <div className="w-full flex justify-between items-center gap-2">
+                              <span className="text-sm truncate md:w-2/3">{file.name}</span>
+                              <div className="flex items-center gap-4">
+                                <span className="text-xs font-bold text-muted-foreground">{`${(file.size / 1024 / 1024).toFixed(2)} MB`}</span>
+                                <Button variant="ghost" size="icon" onClick={() => handleRemoveFile(file.name)} className="size-6 text-muted-foreground hover:text-red-500 hover:bg-red-50">
+                                  <X className="size-4" />
+                                </Button>
+                              </div>
                             </div>
                           </div>
-                        </div>
-
-                      </>)}
-                    </div>
-                  </ScrollArea>
+                        </>)}
+                      </div>
+                    </ScrollArea>
                   </div>
-
 
                   <div className="flex justify-end gap-2">
                     <Button size="lg" onClick={handleReset} variant="outline">Limpiar</Button>
@@ -200,7 +194,7 @@ export default function ConverterDropzone() {
         </>
       ) : (
         <div className="flex flex-col gap-y-4">
-          <div className="flex gap-4 justify-between items-center bg-muted/30 p-4 border">
+          <div className="flex max-md:flex-col max-md:items-start gap-4 justify-between items-center bg-muted/30 p-4 border">
             <div className="flex flex-col gap-1">
               <span className="text-sm font-medium">Estado: {appState === 'UPLOADING' ? 'Subiendo...' : appState === 'CONVERTING' ? 'Convirtiendo...' : 'Finalizado'}</span>
               <span className="text-xs text-muted-foreground">{fileEntries.length} archivo(s) procesados.</span>
@@ -229,9 +223,9 @@ export default function ConverterDropzone() {
                 Procesando
               </h2>
 
-              <ScrollArea className="h-48 w-full">
+              <ScrollArea className="w-full max-h-[35dvh] md:max-h-[calc(100dvh-250px)]">
                 {activeEntries.map((file) => (
-                  <div key={file.id} className="p-4 bg-primary/10 hover:bg-primary/20 group flex items-center justify-between gap-2">
+                  <div key={file.id} className="p-3 px-4 border-b border-primary/15 overflow-hidden transition-colors duration-200 flex">
                     <div className="grid shrink-0 place-content-center">
                       <FileText className="inline size-6" />
                     </div>
@@ -262,11 +256,9 @@ export default function ConverterDropzone() {
                 <CheckCircle className="mr-1 size-4" />
                 Finalizados
               </h2>
-              <ScrollArea className="h-48 w-full">
+              <ScrollArea className="w-full max-h-[50dvh] md:max-h-[calc(100dvh-250px)]">
                 {completedEntries.map((file) => <>
-                  <div key={file.id} className="p-4 bg-primary/10 hover:bg-primary/20 group flex items-center justify-between">
-
-
+                  <div key={file.id} className="p-3 px-4 border-b border-primary/15 overflow-hidden transition-colors duration-200 flex justify-between items-center">
                     <div className="flex items-center gap-2">
                       <div className="grid shrink-0 place-content-center">
                         {file.status === 'error' ? <AlertCircle className="inline size-6 text-red-500" /> : <FileText className="inline size-6" />}
@@ -288,12 +280,9 @@ export default function ConverterDropzone() {
                             {file.downloadFilename}
                           </span>)}
                       </div>
-
                     </div>
 
                     <div>
-
-
                       {file.status === 'downloaded' &&
                         <Button variant="ghost" size="icon" className="size-6 text-muted-foreground hover:text-green-500 hover:bg-green-50 ml-4">
                           <Check className="size-4" />
@@ -304,13 +293,9 @@ export default function ConverterDropzone() {
                           <Download className="size-4" />
                         </Button>
                       )}
-
                     </div>
-
-
                   </div>
 
-                  <Separator className="bg-primary" />
                 </>)}
               </ScrollArea>
             </div>

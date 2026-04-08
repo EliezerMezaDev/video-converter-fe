@@ -23,6 +23,7 @@
       "@/*": ["./*"],
       "@styles/*": ["./src/styles/*"],
       "@hooks/*": ["./src/shared/hooks/*"],
+      "@providers/*": ["./src/shared/providers/*"],
       "@components/*": ["./src/shared/components/*"],
       "@shadcn/*": ["./src/shared/shadcn/*"]
     }

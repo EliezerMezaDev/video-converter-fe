@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Video, ArrowRight, Zap, Shield, Layers, Music2 } from "lucide-react";
+import { Video, ArrowRight, Zap, Shield, Layers, Music2, ImageIcon } from "lucide-react";
 import { Card, CardContent } from "@/src/shared/shadcn/components/ui/card";
 import { Badge } from "@/src/shared/shadcn/components/ui/badge";
 
@@ -9,7 +9,7 @@ const tools = [
     href: "/d/converter",
     icon: Video,
     label: "Video",
-    title: "Convertidor de Video",
+    title: "Convertidor de video",
     description: "Convierte archivos MOV a MP4 de forma instantánea. Soporta lotes de archivos con seguimiento en tiempo real del progreso.",
     features: ["Conversión por lote", "Progreso en tiempo real", "Sin pérdida de calidad"],
     badge: "Disponible",
@@ -19,9 +19,19 @@ const tools = [
     href: "/d/music",
     icon: Music2,
     label: "Música",
-    title: "Búsqueda de Música",
-    description: "Encuentra y descarga música libre de derechos desde la biblioteca de Pixabay. Previsualiza y filtra por género.",
+    title: "Búsqueda de música",
+    description: "Encuentra y descarga música libre de derechos desde la biblioteca de Jamendo. Previsualiza y filtra por género.",
     features: ["Libre de derechos", "Preview en línea", "Filtros por género"],
+    badge: "Disponible",
+  },
+  {
+    id: "media",
+    href: "/d/media",
+    icon: ImageIcon,
+    label: "Media",
+    title: "Búsqueda de media",
+    description: "Encuentra y descarga imágenes y videos de alta calidad desde la biblioteca de Pixabay. Previsualiza y filtra por categoría.",
+    features: ["Imágenes de alta calidad", "Videos de alta calidad"],
     badge: "Disponible",
   },
 ];
@@ -34,13 +44,9 @@ const highlights = [
 
 export default function OverviewPage() {
   return (
-    <div className="mx-auto w-full max-w-5xl px-6 py-10 flex flex-col gap-12">
-
+    <div className="mx-auto w-full max-w-5xl py-4 lg:px-6 lg:py-10 flex flex-col gap-12">
       {/* Hero */}
-      <section className="flex flex-col gap-3">
-        <Badge variant="outline" className="w-fit text-primary border-primary/40 bg-primary/5">
-          Web Utils
-        </Badge>
+      <section className="flex flex-col gap-3">        
         <h1 className="text-4xl font-bold tracking-tight">Bienvenido al panel de utilidades</h1>
         <p className="text-muted-foreground text-lg max-w-2xl">
           Un conjunto de herramientas web para simplificar tus flujos de trabajo. Selecciona una utilidad para comenzar.
@@ -50,13 +56,13 @@ export default function OverviewPage() {
       {/* Tool cards */}
       <section className="flex flex-col gap-4">
         <h2 className="text-sm font-medium uppercase tracking-widest text-muted-foreground">Utilidades disponibles</h2>
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
           {tools.map((tool) => {
             const Icon = tool.icon;
             return (
               <Link key={tool.id} href={tool.href} className="group focus-visible:outline-none">
                 <Card className="h-full border border-border bg-card transition-all duration-200 hover:border-primary/50 hover:shadow-md hover:shadow-primary/5">
-                  <CardContent className="flex h-full flex-col gap-4 p-6">
+                  <CardContent className="flex h-full flex-col gap-4 py-2 px-4 lg:p-6">
                     <div className="flex items-start justify-between">
                       <div className="grid size-11 place-content-center rounded-xl border border-primary/20 bg-primary/10 text-primary transition-colors group-hover:bg-primary/20">
                         <Icon className="size-5" />
@@ -98,7 +104,7 @@ export default function OverviewPage() {
       </section>
 
       {/* Highlights */}
-      <section className="flex flex-col gap-4">
+      {/* <section className="flex flex-col gap-4">
         <h2 className="text-sm font-medium uppercase tracking-widest text-muted-foreground">¿Por qué Web Utils?</h2>
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
           {highlights.map(h => {
@@ -114,7 +120,7 @@ export default function OverviewPage() {
             );
           })}
         </div>
-      </section>
+      </section> */}
     </div>
   );
 }

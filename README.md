@@ -64,7 +64,7 @@ src/
 | `/` | Landing page |
 | `/d/` | Overview con tarjetas de utilidades |
 | `/d/converter` | Convertidor MOV → MP4 |
-| `/d/music` | Búsqueda de música (Pixabay) |
+| `/d/music` | Búsqueda de música (Jamendo) |
 
 ---
 
@@ -101,7 +101,7 @@ npm run typecheck  # Verificación TypeScript
 
 ### Búsqueda de Música
 - Búsqueda por término, género, orden y paginación
-- Lista de resultados normalizados desde Pixabay
+- Lista de resultados normalizados desde Jamendo
 - Preview de audio en línea (proxy BE, no expone CDN)
 - Descarga via enlace directo
 - Caché en el servidor (10 min TTL)
