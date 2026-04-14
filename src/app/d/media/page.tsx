@@ -4,7 +4,7 @@ import React, { useEffect } from "react";
 import {
   Search, ImageIcon, Film, Download, ChevronLeft, ChevronRight,
   Loader2, AlertCircle, Eye, X, Heart, ArrowDownToLine, Play,
-  Image as ImageIconSolid, Layers, Camera,
+  Camera,
 } from "lucide-react";
 import { Button } from "@shadcn/components/ui/button";
 import { Input } from "@shadcn/components/ui/input";
@@ -15,15 +15,13 @@ import {
   SelectLabel, SelectTrigger, SelectValue,
 } from "@shadcn/components/ui/select";
 import {
-  usePixabaySearch,
+  usePexelsSearch,
   MEDIA_TYPE_OPTIONS,
-  IMAGE_TYPE_OPTIONS,
-  CATEGORY_OPTIONS,
-  ORDER_OPTIONS,
-  type PixabayItem,
-  type ImageType,
+  ORIENTATION_OPTIONS,
+  type PexelsItem,
+  type Orientation,
   type MediaType,
-} from "@hooks/use-pixabay-search";
+} from "@hooks/use-pexels-search";
 import PageHeader from "@/src/shared/components/ui/page-header";
 import PageWrapper from "@/src/shared/components/ui/page-wrapper";
 import { ScrollArea } from "@/src/shared/shadcn/components/ui/scroll-area";
@@ -42,21 +40,17 @@ const fmtDuration = (s: number) =>
 
 const TYPE_ICON: Record<string, React.ReactNode> = {
   photo: <Camera className="size-3" />,
-  illustration: <Layers className="size-3" />,
-  vector: <ImageIconSolid className="size-3" />,
   video: <Film className="size-3" />,
 };
 
 const TYPE_LABEL: Record<string, string> = {
   photo: "Foto",
-  illustration: "Ilustración",
-  vector: "Vector",
   video: "Video",
 };
 
 // ── Media Preview Modal ────────────────────────────────────────────────────────
 
-function MediaModal({ item, onClose }: { item: PixabayItem; onClose: () => void }) {
+function MediaModal({ item, onClose }: { item: PexelsItem; onClose: () => void }) {
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => e.key === "Escape" && onClose();
     document.addEventListener("keydown", onKey);
@@ -118,15 +112,21 @@ function MediaModal({ item, onClose }: { item: PixabayItem; onClose: () => void 
 
           {/* Stats */}
           <div className="flex items-center gap-4 text-sm text-muted-foreground">
-            <span className="flex items-center gap-1">
-              <Eye className="size-3.5" /> {fmtNum(item.views)}
-            </span>
-            <span className="flex items-center gap-1">
-              <ArrowDownToLine className="size-3.5" /> {fmtNum(item.downloads)}
-            </span>
-            <span className="flex items-center gap-1">
-              <Heart className="size-3.5" /> {fmtNum(item.likes)}
-            </span>
+            {item.views > 0 && (
+              <span className="flex items-center gap-1">
+                <Eye className="size-3.5" /> {fmtNum(item.views)}
+              </span>
+            )}
+            {item.downloads > 0 && (
+              <span className="flex items-center gap-1">
+                <ArrowDownToLine className="size-3.5" /> {fmtNum(item.downloads)}
+              </span>
+            )}
+            {item.likes > 0 && (
+              <span className="flex items-center gap-1">
+                <Heart className="size-3.5" /> {fmtNum(item.likes)}
+              </span>
+            )}
             {item.user && <span className="ml-auto font-medium text-foreground">{item.user}</span>}
           </div>
 
@@ -144,7 +144,7 @@ function MediaModal({ item, onClose }: { item: PixabayItem; onClose: () => void 
             {item.pageUrl && (
               <a href={item.pageUrl} target="_blank" rel="noopener noreferrer">
                 <Button variant="outline" className="gap-2">
-                  Ver en Pixabay
+                  Ver en Pexels
                 </Button>
               </a>
             )}
@@ -165,7 +165,7 @@ function MediaSkeleton() {
 
 // ── Media Card ─────────────────────────────────────────────────────────────────
 
-function MediaCard({ item, onOpen }: { item: PixabayItem; onOpen: (item: PixabayItem) => void }) {
+function MediaCard({ item, onOpen }: { item: PexelsItem; onOpen: (item: PexelsItem) => void }) {
   const isVideo = item.type === "video";
   const thumbSrc = item.previewUrl ?? item.webformatUrl;
 
@@ -228,28 +228,28 @@ function MediaCard({ item, onOpen }: { item: PixabayItem; onOpen: (item: Pixabay
 
 // ── Page ──────────────────────────────────────────────────────────────────────
 
-export default function PixabaySearchPage() {
+export default function PexelsSearchPage() {
   const {
     params, results, total, totalHits, totalPages,
     isLoading, error, hasSearched,
     selectedItem, openItem, closeItem,
     handleSearch, handlePageChange, applyFilter,
-  } = usePixabaySearch();
+  } = usePexelsSearch();
 
   const start = total === 0 ? 0 : (params.page - 1) * params.per_page + 1;
-  const end = Math.min(params.page * params.per_page, Math.min(totalHits, 500));
+  const end   = Math.min(params.page * params.per_page, totalHits);
   const displayMedia = params.media_type === 'videos' ? 'videos' : 'imágenes';
 
   return (
-    <PageWrapper wrapperId="pixabay-page">
+    <PageWrapper wrapperId="pexels-page">
       {/* Modal */}
       {selectedItem && <MediaModal item={selectedItem} onClose={closeItem} />}
 
       {/* Header */}
       <PageHeader
-        headerId="pixabay-page-header"
+        headerId="pexels-page-header"
         title="Búsqueda de Media"
-        description="Encuentra imágenes, vectores, ilustraciones y videos libres de derechos desde Pixabay."
+        description="Encuentra fotos y videos libres de derechos desde Pexels."
         icon={<ImageIcon className="size-6" />}
       />
 
@@ -257,100 +257,64 @@ export default function PixabaySearchPage() {
         {/* ── Search bar ── */}
         <div className="w-full flex flex-col gap-3">
           <div className="flex flex-wrap gap-2">
-            
-              <div className="relative flex-1">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground pointer-events-none" />
-                <Input
-                  id="pixabay-search-input"
-                  className="pl-9 min-w-[50dvw] md:min-w-50"
-                  placeholder="Buscar por tema, estilo, colores…"
-                  value={params.q}
-                  onChange={(e) => applyFilter({ q: e.target.value })}
-                  onKeyDown={(e) => e.key === "Enter" && handleSearch()}
-                />
-              </div>
 
-              <Select
-                value={params.media_type}
-                onValueChange={(v) => applyFilter({ media_type: v as MediaType, image_type: 'all' })}
-              >
-                <SelectTrigger id="pixabay-filter-media" className="w-30">
-                  <SelectValue placeholder="Tipo" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectGroup>
-                    <SelectLabel>Tipo de media</SelectLabel>
-                    {MEDIA_TYPE_OPTIONS.map((o) => (
-                      <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>
-                    ))}
-                  </SelectGroup>
-                </SelectContent>
-              </Select>
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground pointer-events-none" />
+              <Input
+                id="pexels-search-input"
+                className="pl-9 min-w-[50dvw] md:min-w-50"
+                placeholder="Buscar por tema, estilo, colores…"
+                value={params.q}
+                onChange={(e) => applyFilter({ q: e.target.value })}
+                onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+              />
+            </div>
 
-              {/* Image type — only for images */}
-              {params.media_type === "images" && (
-                <Select
-                  value={params.image_type}
-                  onValueChange={(v) => applyFilter({ image_type: v as ImageType })}
-                >
-                  <SelectTrigger id="pixabay-filter-image-type" className="w-30">
-                    <SelectValue placeholder="Formato" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectGroup>
-                      <SelectLabel>Formato de imagen</SelectLabel>
-                      {IMAGE_TYPE_OPTIONS.map((o) => (
-                        <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>
-                      ))}
-                    </SelectGroup>
-                  </SelectContent>
-                </Select>
-              )}
+            {/* Media type */}
+            <Select
+              value={params.media_type}
+              onValueChange={(v) => applyFilter({ media_type: v as MediaType })}
+            >
+              <SelectTrigger id="pexels-filter-media" className="w-30">
+                <SelectValue placeholder="Tipo" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectGroup>
+                  <SelectLabel>Tipo de media</SelectLabel>
+                  {MEDIA_TYPE_OPTIONS.map((o) => (
+                    <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>
+                  ))}
+                </SelectGroup>
+              </SelectContent>
+            </Select>
 
-              {/* Category */}
-              <Select
-                value={params.category}
-                onValueChange={(v) => applyFilter({ category: v as string })}
-              >
-                <SelectTrigger id="pixabay-filter-category" className="w-30">
-                  <SelectValue placeholder="Categoría" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectGroup>
-                    <SelectLabel>Categoría</SelectLabel>
-                    {CATEGORY_OPTIONS.map((o) => (
-                      <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>
-                    ))}
-                  </SelectGroup>
-                </SelectContent>
-              </Select>
+            {/* Orientation */}
+            <Select
+              value={params.orientation}
+              onValueChange={(v) => applyFilter({ orientation: v as Orientation })}
+            >
+              <SelectTrigger id="pexels-filter-orientation" className="w-32">
+                <SelectValue placeholder="Orientación" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectGroup>
+                  <SelectLabel>Orientación</SelectLabel>
+                  {ORIENTATION_OPTIONS.map((o) => (
+                    <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>
+                  ))}
+                </SelectGroup>
+              </SelectContent>
+            </Select>
 
-              {/* Order */}
-              <Select
-                value={params.order}
-                onValueChange={(v) => applyFilter({ order: v as "popular" | "latest" })}
-              >
-                <SelectTrigger id="pixabay-filter-order" className="w-30">
-                  <SelectValue placeholder="Orden" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectGroup>
-                    <SelectLabel>Ordenar por</SelectLabel>
-                    {ORDER_OPTIONS.map((o) => (
-                      <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>
-                    ))}
-                  </SelectGroup>
-                </SelectContent>
-              </Select>
-              <Button
-                id="pixabay-search-btn"
-                onClick={handleSearch}
-                disabled={isLoading}
-                className="gap-2 shrink-0"
-              >
-                {isLoading ? <Loader2 className="size-4 animate-spin" /> : <Search className="size-4" />}
-                {isLoading ? "Buscando…" : "Buscar"}
-              </Button>
+            <Button
+              id="pexels-search-btn"
+              onClick={handleSearch}
+              disabled={isLoading}
+              className="gap-2 shrink-0"
+            >
+              {isLoading ? <Loader2 className="size-4 animate-spin" /> : <Search className="size-4" />}
+              {isLoading ? "Buscando…" : "Buscar"}
+            </Button>
           </div>
         </div>
 
@@ -389,7 +353,6 @@ export default function PixabaySearchPage() {
         {/* ── Results grid ── */}
         {!isLoading && hasSearched && results.length > 0 && (
           <>
-            {/* Count */}
             <ScrollArea className="w-full h-full max-h-[55dvh] md:max-h-[60dvh]">
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
                 {results.map((item) => (
@@ -405,8 +368,8 @@ export default function PixabaySearchPage() {
                   Mostrando{" "}
                   <span className="font-medium text-foreground">{start}–{end}</span>{" "}
                   de{" "}
-                  <span className="hidden md:block font-medium text-foreground">
-                    {totalHits >= 500 ? "500+" : totalHits.toLocaleString()}
+                  <span className="hidden md:inline font-medium text-foreground">
+                    {totalHits.toLocaleString()}
                   </span>{" "}
                   {displayMedia} · Pág. {params.page}/{totalPages}
                 </p>
@@ -421,7 +384,7 @@ export default function PixabaySearchPage() {
                   >
                     <ChevronLeft className="size-4" /> Anterior
                   </Button>
-                  <span className="hidden md:block text-sm text-muted-foreground">
+                  <span className="hidden md:block text-sm text-muted-foreground px-4">
                     Página {params.page} de {totalPages}
                   </span>
                   <Button
@@ -447,7 +410,7 @@ export default function PixabaySearchPage() {
             </div>
             <p className="font-medium">Sin resultados</p>
             <p className="text-sm text-muted-foreground">
-              Intenta con otros términos, categoría o tipo de media
+              Intenta con otros términos u orientación
             </p>
           </div>
         )}

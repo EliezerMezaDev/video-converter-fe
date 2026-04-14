@@ -30,8 +30,8 @@ const tools = [
     icon: ImageIcon,
     label: "Media",
     title: "Búsqueda de media",
-    description: "Encuentra y descarga imágenes y videos de alta calidad desde la biblioteca de Pixabay. Previsualiza y filtra por categoría.",
-    features: ["Imágenes de alta calidad", "Videos de alta calidad"],
+    description: "Encuentra y descarga fotos y videos de alta calidad desde la biblioteca de Pexels. Previsualiza y filtra por orientación.",
+    features: ["Imágenes de alta calidad", "Videos de alta calidad", "Filtro por orientación"],
     badge: "Disponible",
   },
 ];
