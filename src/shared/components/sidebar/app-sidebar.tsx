@@ -70,8 +70,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   return (
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
-        <Link href="/" className={cn("inline-flex items-center justify-center gap-2", state !== 'collapsed' ? "p-2 pb-0" : "p-0 mt-2")}>
-          <Image src="/images/brand/isotipo.png" alt="Logo" width={24} height={24} />
+        <Link href="/" title="WEB Tools" className={cn("inline-flex items-center justify-center gap-2", state !== 'collapsed' ? "p-2 pb-0" : "p-0 mt-2")}>
+          <Image src="/images/brand/isotipo.png" alt="WEB Tools Logo" title="WEB Tools Logo" width={24} height={24} />
           {state !== 'collapsed' && <span className="w-full font-bold whitespace-nowrap">WEB Tools</span>}
         </Link>
       </SidebarHeader>

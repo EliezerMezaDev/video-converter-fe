@@ -1,6 +1,6 @@
 # video-converter-fe
 
-Frontend de **Web-Utils** — plataforma de utilidades web construida con Next.js 16.
+Frontend de **Web-Utils** — plataforma de herramientas web construida con Next.js 16.
 
 ---
 
@@ -30,7 +30,7 @@ src/
 │   ├── page.tsx                # Página raíz "/"
 │   └── d/                      # Dashboard (con sidebar)
 │       ├── layout.tsx          # Layout con AppSidebar
-│       ├── page.tsx            # Overview con cards de utilidades
+│       ├── page.tsx            # Overview con cards de herramientas
 │       ├── converter/
 │       │   └── page.tsx        # Convertidor de video
 │       └── music/
@@ -62,7 +62,7 @@ src/
 | Ruta | Descripción |
 |---|---|
 | `/` | Landing page |
-| `/d/` | Overview con tarjetas de utilidades |
+| `/d/` | Overview con tarjetas de herramientas |
 | `/d/converter` | Convertidor MOV → MP4 |
 | `/d/music` | Búsqueda de música (Jamendo) |
 

@@ -36,7 +36,7 @@ export function NavMain({
   return (
     <SidebarGroup>
       <SidebarMenuItem>
-        <Link href="/d/">
+        <Link href="/d/" title="Inicio">
           <SidebarMenuButton tooltip="Inicio">
             <Home />
             <span>Inicio</span>
@@ -54,7 +54,7 @@ export function NavMain({
           >
             <SidebarMenuItem>
               <CollapsibleTrigger>
-                <Link href={item.url ?? '#'}>
+                <Link href={item.url ?? '#'} title={item.title}>
                   <SidebarMenuButton tooltip={item.title}>
                     {item.icon && <item.icon />}
                     <span>{item.title}</span>
@@ -67,7 +67,7 @@ export function NavMain({
                   {item.items?.map((subItem) => (
                     <SidebarMenuSubItem key={subItem.title}>
                       <SidebarMenuSubButton>
-                        <Link href={subItem.url ?? '#'}>
+                        <Link href={subItem.url ?? '#'} title={subItem.title}>
                           <span>{subItem.title}</span>
                         </Link>
                       </SidebarMenuSubButton>

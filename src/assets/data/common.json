@@ -1,0 +1,21 @@
+{
+  "siteName": "WEB tools",
+  "siteUrl": "https://web-tools.up.railway.app/",
+  "locale": "es_ES",
+  "language": "es",
+  "description": "Plataforma de herramientas web para simplificar tus flujos de trabajo. Convierte videos, busca música libre de derechos y encuentra media de alta calidad.",
+  "ogImage": "/og-image.webp",
+  "twitterHandle": "@webtools",
+  "organization": {
+    "name": "WEB tools",
+    "url": "https://web-tools.up.railway.app/",
+    "logo": "https://web-tools.up.railway.app/favicon.ico"
+  },
+  "routes": {
+    "root": "/",
+    "dashboard": "/d",
+    "converter": "/d/converter",
+    "music": "/d/music",
+    "media": "/d/media"
+  }
+}

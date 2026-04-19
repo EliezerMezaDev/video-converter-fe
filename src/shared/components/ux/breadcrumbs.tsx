@@ -48,7 +48,7 @@ export function DashboardBreadcrumbs() {
               <BreadcrumbPage>{crumb.label}</BreadcrumbPage>
             ) : (
               <>
-                <BreadcrumbLink render={<Link href={crumb.href} />}>
+                <BreadcrumbLink render={<Link href={crumb.href} title={crumb.label} />}>
                   {crumb.label}
                 </BreadcrumbLink>
                 <BreadcrumbSeparator />

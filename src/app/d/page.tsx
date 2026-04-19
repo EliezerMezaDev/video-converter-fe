@@ -1,7 +1,11 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { Video, ArrowRight, Zap, Shield, Layers, Music2, ImageIcon } from "lucide-react";
 import { Card, CardContent } from "@/src/shared/shadcn/components/ui/card";
 import { Badge } from "@/src/shared/shadcn/components/ui/badge";
+import { constructMetadata } from "@/src/shared/lib/seo/construct-metadata";
+
+export const metadata: Metadata = constructMetadata("dashboard");
 
 const tools = [
   {
@@ -47,7 +51,7 @@ export default function OverviewPage() {
     <div className="mx-auto w-full max-w-5xl py-4 lg:px-6 lg:py-10 flex flex-col gap-12">
       {/* Hero */}
       <section className="flex flex-col gap-3">        
-        <h1 className="text-4xl font-bold tracking-tight">Bienvenido al panel de utilidades</h1>
+        <h1 className="text-4xl font-bold tracking-tight">Bienvenido al panel de herramientas</h1>
         <p className="text-muted-foreground text-lg max-w-2xl">
           Un conjunto de herramientas web para simplificar tus flujos de trabajo. Selecciona una utilidad para comenzar.
         </p>
@@ -60,7 +64,7 @@ export default function OverviewPage() {
           {tools.map((tool) => {
             const Icon = tool.icon;
             return (
-              <Link key={tool.id} href={tool.href} className="group focus-visible:outline-none">
+              <Link key={tool.id} href={tool.href} title={tool.title} className="group focus-visible:outline-none">
                 <Card className="h-full border border-border bg-card transition-all duration-200 hover:border-primary/50 hover:shadow-md hover:shadow-primary/5">
                   <CardContent className="flex h-full flex-col gap-4 py-2 px-4 lg:p-6">
                     <div className="flex items-start justify-between">
@@ -97,7 +101,7 @@ export default function OverviewPage() {
                 <Layers className="size-5" />
               </div>
               <p className="text-sm font-medium text-muted-foreground">Próximamente</p>
-              <p className="text-xs text-muted-foreground/70">Nuevas utilidades en desarrollo</p>
+              <p className="text-xs text-muted-foreground/70">Nuevas herramientas en desarrollo</p>
             </CardContent>
           </Card>
         </div>
@@ -105,7 +109,7 @@ export default function OverviewPage() {
 
       {/* Highlights */}
       {/* <section className="flex flex-col gap-4">
-        <h2 className="text-sm font-medium uppercase tracking-widest text-muted-foreground">¿Por qué Web Utils?</h2>
+        <h2 className="text-sm font-medium uppercase tracking-widest text-muted-foreground">¿Por qué WEB tools?</h2>
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
           {highlights.map(h => {
             const Icon = h.icon;
