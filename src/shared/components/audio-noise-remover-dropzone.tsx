@@ -7,13 +7,6 @@ import { Card } from "@shadcn/components/ui/card";
 import { ScrollArea } from "@shadcn/components/ui/scroll-area";
 import { Alert, AlertTitle } from "@shadcn/components/ui/alert";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@shadcn/components/ui/select";
-import {
   Upload,
   FileAudio,
   X,
@@ -27,8 +20,6 @@ import {
 } from "lucide-react";
 import {
   useAudioNoiseRemover,
-  STRENGTH_LEVELS,
-  type StrengthLevel,
   type AudioFileEntry,
 } from "../hooks/use-audio-noise-remover";
 
@@ -105,8 +96,6 @@ export default function AudioNoiseRemoverDropzone() {
     appState,
     selectedFiles,
     fileEntries,
-    strength,
-    setStrength,
     isConnected,
     toastMessage,
     handleFilesSelected,
@@ -240,24 +229,6 @@ export default function AudioNoiseRemoverDropzone() {
                   <FileAudio className="mr-1 size-4" />
                   Audios ({selectedFiles.length})
                 </h2>
-                <div className="flex items-center gap-2">
-                  <span className="text-sm text-muted-foreground whitespace-nowrap">Intensidad:</span>
-                  <Select
-                    value={strength}
-                    onValueChange={(v) => setStrength(v as StrengthLevel)}
-                  >
-                    <SelectTrigger className="w-28 h-8 text-sm">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {STRENGTH_LEVELS.map((s) => (
-                        <SelectItem key={s.value} value={s.value}>
-                          {s.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
               </div>
 
               <ScrollArea className="w-full max-h-[50dvh] md:max-h-[calc(100dvh-280px)]">
@@ -294,7 +265,7 @@ export default function AudioNoiseRemoverDropzone() {
                 </Button>
                 <Button size="lg" onClick={handleUpload} disabled={!isConnected}>
                   <Upload className="size-4" />
-                  Procesar ({STRENGTH_LEVELS.find((s) => s.value === strength)?.label})
+                  Procesar
                 </Button>
               </div>
             </div>

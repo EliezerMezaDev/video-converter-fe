@@ -4,13 +4,6 @@ import { useSocket } from './use-socket';
 
 export type AudioAppState = 'IDLE' | 'UPLOADING' | 'PROCESSING' | 'FINISHED';
 export type AudioFileStatus = 'pending' | 'uploading' | 'uploaded' | 'processing' | 'completed' | 'error' | 'downloaded';
-export type StrengthLevel = 'soft' | 'medium' | 'strong';
-
-export const STRENGTH_LEVELS: { value: StrengthLevel; label: string; description: string }[] = [
-  { value: 'soft',   label: 'Suave',  description: 'Reducción leve, máxima fidelidad' },
-  { value: 'medium', label: 'Medio',  description: 'Balance entre limpieza y calidad' },
-  { value: 'strong', label: 'Fuerte', description: 'Reducción agresiva de ruido' },
-];
 
 export interface AudioFileEntry {
   id: string;
@@ -29,7 +22,6 @@ export function useAudioNoiseRemover() {
   const [appState, setAppState] = useState<AudioAppState>('IDLE');
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [fileEntries, setFileEntries] = useState<AudioFileEntry[]>([]);
-  const [strength, setStrength] = useState<StrengthLevel>('medium');
   const [toastMessage, setToastMessage] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
   const { socketId, isConnected, on, off } = useSocket();
 
@@ -136,7 +128,6 @@ export function useAudioNoiseRemover() {
     const formData = new FormData();
     selectedFiles.forEach((file) => formData.append('audios', file));
     formData.append('socketId', socketId);
-    formData.append('strength', strength);
 
     try {
       await axios.post(`${API_URL}/api/v1/audio/upload`, formData, {
@@ -169,7 +160,7 @@ export function useAudioNoiseRemover() {
       setFileEntries((prev) => prev.map((f) => ({ ...f, status: 'error' as AudioFileStatus, error: message })));
       setAppState('FINISHED');
     }
-  }, [selectedFiles, socketId, strength, addToast]);
+  }, [selectedFiles, socketId, addToast]);
 
   const handleDownload = useCallback(async (entry: AudioFileEntry) => {
     if (!entry.downloadFilename) return;
@@ -214,8 +205,6 @@ export function useAudioNoiseRemover() {
     appState,
     selectedFiles,
     fileEntries,
-    strength,
-    setStrength,
     isConnected,
     toastMessage,
     handleFilesSelected,
