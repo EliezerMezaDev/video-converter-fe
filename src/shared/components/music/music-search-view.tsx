@@ -36,14 +36,14 @@ function TrackCard({ track, isPlaying, onToggle }: {
   track: MusicTrack; isPlaying: boolean; onToggle: (id: string) => void;
 }) {
   return (
-    <div className={`border-b border-primary/25 overflow-hidden transition-colors duration-200`}>
+    <div className="border-b border-border overflow-hidden transition-colors duration-200 hover:bg-muted/30">
       <div className="flex items-center gap-3 p-3 px-4">
         {/* Play button */}
         <button
           onClick={() => onToggle(track.id)}
-          className={`grid shrink-0 size-10 place-content-center rounded-full  transition-colors cursor-pointer ${isPlaying
-            ? "bg-accent text-primary-foreground "
-            : "bg-primary/50 text-primary-foreground hover:bg-primary hover:text-primary"
+          className={`grid shrink-0 size-9 place-content-center rounded-md transition-colors cursor-pointer ${isPlaying
+            ? "bg-primary text-primary-foreground"
+            : "bg-primary/10 text-primary hover:bg-primary hover:text-primary-foreground"
             }`}
           aria-label={isPlaying ? "Detener" : "Reproducir"}
         >

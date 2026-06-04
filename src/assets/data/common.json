@@ -16,6 +16,8 @@
     "dashboard": "/d",
     "converter": "/d/converter",
     "music": "/d/music",
-    "media": "/d/media"
+    "media": "/d/media",
+    "images": "/d/images",
+    "audio": "/d/audio"
   }
 }

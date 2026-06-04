@@ -1,36 +1,37 @@
-import { useState, useCallback, useRef, useEffect, use } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import axios from 'axios';
 import { useSocket } from './use-socket';
 
-export type AppState = 'IDLE' | 'UPLOADING' | 'CONVERTING' | 'FINISHED';
-export type FileStatus = 'uploading' | 'uploaded' | 'converting' | 'completed' | 'error' | 'downloaded';
+export type AudioAppState = 'IDLE' | 'UPLOADING' | 'PROCESSING' | 'FINISHED';
+export type AudioFileStatus = 'pending' | 'uploading' | 'uploaded' | 'processing' | 'completed' | 'error' | 'downloaded';
+export type StrengthLevel = 'soft' | 'medium' | 'strong';
 
-export interface FileEntry {
+export const STRENGTH_LEVELS: { value: StrengthLevel; label: string; description: string }[] = [
+  { value: 'soft',   label: 'Suave',  description: 'Reducción leve, máxima fidelidad' },
+  { value: 'medium', label: 'Medio',  description: 'Balance entre limpieza y calidad' },
+  { value: 'strong', label: 'Fuerte', description: 'Reducción agresiva de ruido' },
+];
+
+export interface AudioFileEntry {
   id: string;
   file: File;
-  name: string;
   originalName: string;
   size: number;
-  status: FileStatus;
+  status: AudioFileStatus;
   uploadProgress: number;
   error: string | null;
   downloadFilename: string | null;
 }
 
-export const OUTPUT_FORMATS = ['mp4', 'mkv', 'webm', 'avi', 'mov', 'flv'] as const;
-export type OutputFormat = typeof OUTPUT_FORMATS[number];
-
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
 
-export function useVideoConverter() {
-  const [appState, setAppState] = useState<AppState>('IDLE');
+export function useAudioNoiseRemover() {
+  const [appState, setAppState] = useState<AudioAppState>('IDLE');
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
-  const [fileEntries, setFileEntries] = useState<FileEntry[]>([]);
-  const [targetFormat, setTargetFormat] = useState<OutputFormat>('mp4');
-  const { socketId, isConnected, on, off } = useSocket();
-  const isProcessingRef = useRef(false);
-
+  const [fileEntries, setFileEntries] = useState<AudioFileEntry[]>([]);
+  const [strength, setStrength] = useState<StrengthLevel>('medium');
   const [toastMessage, setToastMessage] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
+  const { socketId, isConnected, on, off } = useSocket();
 
   const addToast = useCallback((message: string, type: 'success' | 'error' = 'success') => {
     setToastMessage({ message, type });
@@ -38,82 +39,74 @@ export function useVideoConverter() {
 
   useEffect(() => {
     if (toastMessage) {
-      const t = setTimeout(() => setToastMessage(null), 3000);
+      const t = setTimeout(() => setToastMessage(null), 3500);
       return () => clearTimeout(t);
     }
   }, [toastMessage]);
 
   useEffect(() => {
     const handler = (e: BeforeUnloadEvent) => {
-      if (appState === 'UPLOADING' || appState === 'CONVERTING') {
+      if (appState === 'UPLOADING' || appState === 'PROCESSING') {
         e.preventDefault();
         e.returnValue = '';
       }
     };
-
     window.addEventListener('beforeunload', handler);
     return () => window.removeEventListener('beforeunload', handler);
   }, [appState]);
 
   useEffect(() => {
-    on('conversion:start', (data: any) => {
+    on('audio:progress', (data: any) => {
       setFileEntries((prev) =>
         prev.map((f) =>
-          f.originalName === data.originalName
-            ? { ...f, status: 'converting' as FileStatus }
-            : f
+          f.originalName === data.file ? { ...f, status: 'processing' as AudioFileStatus } : f
         )
       );
     });
 
-    on('conversion:success', (data: any) => {
+    on('audio:success', (data: any) => {
       setFileEntries((prev) => {
         const updated = prev.map((f) =>
           f.originalName === data.originalName
-            ? {
-              ...f,
-              status: 'completed' as FileStatus,
-              downloadFilename: data.resultName,
-            }
+            ? { ...f, status: 'completed' as AudioFileStatus, downloadFilename: data.resultName }
             : f
         );
         const allDone = updated.every(
           (f) => f.status === 'completed' || f.status === 'downloaded' || f.status === 'error'
         );
-        if (allDone) {
-          setTimeout(() => setAppState('FINISHED'), 300);
-        }
+        if (allDone) setTimeout(() => setAppState('FINISHED'), 300);
         return updated;
       });
     });
 
-    on('conversion:error', (data: any) => {
+    on('audio:error', (data: any) => {
       setFileEntries((prev) => {
         const updated = prev.map((f) =>
-          f.originalName === data.originalName
-            ? { ...f, status: 'error' as FileStatus, error: data.error || 'Error de conversión' }
+          f.originalName === data.file
+            ? { ...f, status: 'error' as AudioFileStatus, error: data.error || 'Error al procesar el audio' }
             : f
         );
         const allDone = updated.every(
           (f) => f.status === 'completed' || f.status === 'downloaded' || f.status === 'error'
         );
-        if (allDone) {
-          setTimeout(() => setAppState('FINISHED'), 300);
-        }
+        if (allDone) setTimeout(() => setAppState('FINISHED'), 300);
         return updated;
       });
-      addToast(`Error al convertir "${data.originalName}": ${data.error || 'desconocido'}`, 'error');
+      addToast(`Error al procesar "${data.file}": ${data.error || 'desconocido'}`, 'error');
     });
 
     return () => {
-      off('conversion:start');
-      off('conversion:success');
-      off('conversion:error');
+      off('audio:progress');
+      off('audio:success');
+      off('audio:error');
     };
   }, [on, off, addToast]);
 
   const handleFilesSelected = useCallback((newFiles: File[]) => {
-    setSelectedFiles((prev) => [...prev, ...newFiles]);
+    setSelectedFiles((prev) => {
+      const existingNames = new Set(prev.map((f) => f.name));
+      return [...prev, ...newFiles.filter((f) => !existingNames.has(f.name))];
+    });
   }, []);
 
   const handleRemoveFile = useCallback((fileName: string) => {
@@ -126,16 +119,14 @@ export function useVideoConverter() {
       return;
     }
 
-    isProcessingRef.current = true;
     setAppState('UPLOADING');
 
-    const entries: FileEntry[] = selectedFiles.map((file) => ({
+    const entries: AudioFileEntry[] = selectedFiles.map((file) => ({
       id: crypto.randomUUID(),
       file,
-      name: file.name,
       originalName: file.name,
       size: file.size,
-      status: 'uploading' as FileStatus,
+      status: 'uploading' as AudioFileStatus,
       uploadProgress: 0,
       error: null,
       downloadFilename: null,
@@ -143,12 +134,12 @@ export function useVideoConverter() {
     setFileEntries(entries);
 
     const formData = new FormData();
-    selectedFiles.forEach((file) => formData.append('videos', file));
+    selectedFiles.forEach((file) => formData.append('audios', file));
     formData.append('socketId', socketId);
-    formData.append('targetFormat', targetFormat);
+    formData.append('strength', strength);
 
     try {
-      await axios.post(`${API_URL}/api/convert/upload`, formData, {
+      await axios.post(`${API_URL}/api/v1/audio/upload`, formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
         onUploadProgress: (progressEvent) => {
           const percent = progressEvent.total
@@ -158,7 +149,7 @@ export function useVideoConverter() {
             prev.map((f) => ({
               ...f,
               uploadProgress: percent,
-              status: percent >= 100 ? ('uploaded' as FileStatus) : ('uploading' as FileStatus),
+              status: percent >= 100 ? ('uploaded' as AudioFileStatus) : ('uploading' as AudioFileStatus),
             }))
           );
         },
@@ -167,56 +158,49 @@ export function useVideoConverter() {
       setFileEntries((prev) =>
         prev.map((f) => ({
           ...f,
-          status: f.status === 'uploading' ? ('uploaded' as FileStatus) : f.status,
+          status: f.status === 'uploading' ? ('uploaded' as AudioFileStatus) : f.status,
           uploadProgress: 100,
         }))
       );
-      setAppState('CONVERTING');
+      setAppState('PROCESSING');
     } catch (err: any) {
       const message = err.response?.data?.error || err.message || 'Error al subir los archivos';
       addToast(message, 'error');
-      setFileEntries((prev) => prev.map((f) => ({ ...f, status: 'error' as FileStatus, error: message })));
+      setFileEntries((prev) => prev.map((f) => ({ ...f, status: 'error' as AudioFileStatus, error: message })));
       setAppState('FINISHED');
     }
+  }, [selectedFiles, socketId, strength, addToast]);
 
-    isProcessingRef.current = false;
-  }, [selectedFiles, socketId, targetFormat, addToast]);
-
-  const handleDownload = useCallback(async (file: FileEntry) => {
-    if (!file.downloadFilename) return;
+  const handleDownload = useCallback(async (entry: AudioFileEntry) => {
+    if (!entry.downloadFilename) return;
 
     try {
       const response = await axios.get(
-        `${API_URL}/api/convert/download/${encodeURIComponent(file.downloadFilename)}`,
+        `${API_URL}/api/v1/audio/download/${encodeURIComponent(entry.downloadFilename)}`,
         { responseType: 'blob' }
       );
 
       const url = window.URL.createObjectURL(new Blob([response.data]));
       const link = document.createElement('a');
       link.href = url;
-      link.setAttribute('download', file.downloadFilename);
+      link.setAttribute('download', entry.downloadFilename);
       document.body.appendChild(link);
       link.click();
       link.remove();
       window.URL.revokeObjectURL(url);
 
       setFileEntries((prev) =>
-        prev.map((f) => (f.id === file.id ? { ...f, status: 'downloaded' as FileStatus } : f))
+        prev.map((f) => (f.id === entry.id ? { ...f, status: 'downloaded' as AudioFileStatus } : f))
       );
     } catch {
-      addToast(`Error al descargar "${file.name}"`, 'error');
+      addToast(`Error al descargar "${entry.originalName}"`, 'error');
     }
   }, [addToast]);
 
   const handleDownloadAll = useCallback(async () => {
-    const completedFiles = fileEntries.filter(
-      (f) => f.status === 'completed'
-    );
-
-    if (completedFiles.length === 0) return;
-
-    for (const file of completedFiles) {
-      await handleDownload(file);
+    const completed = fileEntries.filter((f) => f.status === 'completed');
+    for (const entry of completed) {
+      await handleDownload(entry);
     }
   }, [fileEntries, handleDownload]);
 
@@ -230,10 +214,10 @@ export function useVideoConverter() {
     appState,
     selectedFiles,
     fileEntries,
+    strength,
+    setStrength,
     isConnected,
     toastMessage,
-    targetFormat,
-    setTargetFormat,
     handleFilesSelected,
     handleRemoveFile,
     handleUpload,

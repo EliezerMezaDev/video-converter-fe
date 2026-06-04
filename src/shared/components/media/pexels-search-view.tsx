@@ -66,7 +66,7 @@ function MediaModal({ item, onClose }: { item: PexelsItem; onClose: () => void }
       onClick={onClose}
     >
       <div
-        className="relative bg-card rounded-2xl shadow-2xl overflow-hidden max-w-3xl w-full max-h-[90dvh] flex flex-col"
+        className="relative bg-card rounded-md shadow-2xl overflow-hidden max-w-3xl w-full max-h-[90dvh] flex flex-col"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Close */}

@@ -85,6 +85,22 @@ export const pageMetadata = {
     path: common.routes.media,
   }),
 
+  /** /d/images — Image format converter */
+  images: base({
+    title: "Convertidor de imágenes",
+    description:
+      "Convierte imágenes por lotes a WebP, AVIF, PNG o JPEG sin pérdida de calidad. Soporta JPG, PNG, WebP, AVIF, GIF, TIFF y BMP.",
+    path: common.routes.images,
+  }),
+
+  /** /d/audio — Audio noise remover */
+  audio: base({
+    title: "Limpiador de ruido en audio",
+    description:
+      "Elimina el ruido de fondo de tus archivos de audio con distintos niveles de intensidad. Soporta MP3, WAV, M4A, AAC, OGG, FLAC y OPUS.",
+    path: common.routes.audio,
+  }),
+
 } satisfies Record<string, Metadata>;
 
 export type PageMetadataKey = keyof typeof pageMetadata;

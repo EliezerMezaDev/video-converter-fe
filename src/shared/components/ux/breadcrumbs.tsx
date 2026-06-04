@@ -16,6 +16,7 @@ const routeLabels: Record<string, string> = {
   d: "Dashboard",
   converter: "Convertidor de Video",
   music: "Búsqueda de Música",
+  media: "Búsqueda de Media",
 };
 
 function getRouteLabel(segment: string): string {

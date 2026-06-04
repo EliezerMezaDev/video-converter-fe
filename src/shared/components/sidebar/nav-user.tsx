@@ -1,11 +1,4 @@
-import {
-  BadgeCheck,
-  Bell,
-  ChevronsUpDown,
-  CreditCard,
-  LogOut,
-  Sparkles,
-} from "lucide-react"
+import { ChevronsUpDown } from "lucide-react"
 
 import {
   Avatar,
@@ -16,9 +9,7 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuGroup,
-  DropdownMenuItem,
   DropdownMenuLabel,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@shadcn/components/ui/dropdown-menu"
 import {
@@ -27,7 +18,6 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@shadcn/components/ui/sidebar"
-import { ThemeToggle } from "./theme-toggle"
 
 export function NavUser({
   user,
@@ -48,47 +38,43 @@ export function NavUser({
             render={
               <SidebarMenuButton
                 size="lg"
-                className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
+                className="data-[state=open]:bg-sidebar-accent/10 data-[state=open]:text-sidebar-foreground"
               />
             }
           >
-            <Avatar className="h-8 w-8 rounded-lg">
+            <Avatar className="h-7 w-7 rounded-md">
               <AvatarImage src={user.avatar} alt={user.name} title={user.name} />
-              <AvatarFallback className="rounded-lg">CN</AvatarFallback>
+              <AvatarFallback className="rounded-md text-xs">CN</AvatarFallback>
             </Avatar>
             <div
               suppressHydrationWarning
               className="grid flex-1 text-left text-sm leading-tight"
             >
-              <span className="truncate font-medium">{user.name}</span>
-              <span className="truncate text-xs">{user.email}</span>
+              <span className="truncate font-medium text-sm">{user.name}</span>
+              <span className="truncate text-xs text-muted-foreground">{user.email}</span>
             </div>
-            <ChevronsUpDown className="ml-auto size-4" />
+            <ChevronsUpDown className="ml-auto size-4 text-muted-foreground" />
           </DropdownMenuTrigger>
           <DropdownMenuContent
-            className="w-(--radix-dropdown-menu-trigger-width) min-w-56 rounded-lg"
+            className="w-(--radix-dropdown-menu-trigger-width) min-w-56"
             side={isMobile ? "bottom" : "right"}
             align="end"
             sideOffset={4}
           >
             <DropdownMenuGroup>
               <DropdownMenuLabel className="p-0 font-normal">
-                <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
-                  <Avatar className="h-8 w-8 rounded-lg">
+                <div className="flex items-center gap-2 px-2 py-2 text-left text-sm">
+                  <Avatar className="h-7 w-7 rounded-md">
                     <AvatarImage src={user.avatar} alt={user.name} />
-                    <AvatarFallback className="rounded-lg">CN</AvatarFallback>
+                    <AvatarFallback className="rounded-md text-xs">CN</AvatarFallback>
                   </Avatar>
                   <div className="grid flex-1 text-left text-sm leading-tight">
                     <span className="truncate font-medium">{user.name}</span>
-                    <span className="truncate text-xs">{user.email}</span>
+                    <span className="truncate text-xs text-muted-foreground">{user.email}</span>
                   </div>
                 </div>
               </DropdownMenuLabel>
             </DropdownMenuGroup>
-
-            <DropdownMenuSeparator />
-
-            <ThemeToggle />
           </DropdownMenuContent>
         </DropdownMenu>
       </SidebarMenuItem>

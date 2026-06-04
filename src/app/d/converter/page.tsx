@@ -14,7 +14,7 @@ export default function ConverterPage() {
       <JsonLd schemas={constructJsonLd("converter")} />
       <PageHeader
         title="Convertidor de Video"
-        description="Sube tus archivos de video (MOV) y conviértelos de forma rápida y sencilla. Asegúrate de estar conectado al servidor para comenzar."
+        description="Sube tus archivos de video (MP4, MOV, AVI, MKV, WebM y más) y conviértelos al formato que necesites. Asegúrate de estar conectado al servidor para comenzar."
         icon={<Video className="size-6" />}
         headerId="converter-module-header"
       />

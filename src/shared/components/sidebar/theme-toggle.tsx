@@ -1,7 +1,8 @@
-import { DropdownMenuGroup, DropdownMenuItem } from "@shadcn/components/ui/dropdown-menu";
+"use client";
+
 import { useTheme } from "@providers/theme-provider";
-import { Moon } from "lucide-react";
-import { Switch } from "@shadcn/components/ui/switch";
+import { Moon, Sun } from "lucide-react";
+import { Button } from "@shadcn/components/ui/button";
 
 export function ThemeToggle() {
   const { theme, setTheme } = useTheme();
@@ -9,25 +10,18 @@ export function ThemeToggle() {
   const isDarkMode =
     theme === "dark" ||
     (theme === "system" &&
+      typeof window !== "undefined" &&
       window.matchMedia("(prefers-color-scheme: dark)").matches);
 
   return (
-    <DropdownMenuGroup>
-      <DropdownMenuItem
-        className="flex items-center justify-between gap-4 cursor-pointer"
-        onSelect={(e) => e.preventDefault()}
-      >
-        <div className="flex items-center gap-2">
-          <Moon className="h-4 w-4" />
-
-          <label htmlFor="theme-switch">Modo oscuro</label>
-        </div>
-        <Switch
-          id="theme-switch"
-          checked={isDarkMode}
-          onCheckedChange={(checked) => setTheme(checked ? "dark" : "light")}
-        />
-      </DropdownMenuItem>
-    </DropdownMenuGroup>
+    <Button
+      variant="ghost"
+      size="icon"
+      aria-label={isDarkMode ? "Cambiar a modo claro" : "Cambiar a modo oscuro"}
+      onClick={() => setTheme(isDarkMode ? "light" : "dark")}
+      className="size-8 text-muted-foreground hover:text-foreground"
+    >
+      {isDarkMode ? <Sun className="size-4" /> : <Moon className="size-4" />}
+    </Button>
   );
 }

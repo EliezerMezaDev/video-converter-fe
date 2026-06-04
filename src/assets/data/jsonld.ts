@@ -111,6 +111,34 @@ export const pageJsonLd = {
     ]),
   ],
 
+  /** /d/images — Image format converter */
+  images: [
+    webAppSchema(
+      "Convertidor de Imágenes",
+      "Convierte imágenes por lotes a WebP, AVIF, PNG o JPEG sin pérdida de calidad.",
+      abs(common.routes.images)
+    ),
+    breadcrumbSchema([
+      { name: common.siteName, url: common.siteUrl },
+      { name: "Panel de Utilidades", url: abs(common.routes.dashboard) },
+      { name: "Convertidor de Imágenes", url: abs(common.routes.images) },
+    ]),
+  ],
+
+  /** /d/audio — Audio noise remover */
+  audio: [
+    webAppSchema(
+      "Limpiador de Ruido en Audio",
+      "Elimina el ruido de fondo de archivos de audio con distintos niveles de intensidad.",
+      abs(common.routes.audio)
+    ),
+    breadcrumbSchema([
+      { name: common.siteName, url: common.siteUrl },
+      { name: "Panel de Utilidades", url: abs(common.routes.dashboard) },
+      { name: "Limpiador de Ruido en Audio", url: abs(common.routes.audio) },
+    ]),
+  ],
+
 } satisfies Record<string, JsonLdSchema[]>;
 
 export type PageJsonLdKey = keyof typeof pageJsonLd;

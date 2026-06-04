@@ -6,11 +6,14 @@ import { Button } from "@shadcn/components/ui/button";
 import { Progress } from "@shadcn/components/ui/progress";
 import { Card } from "@shadcn/components/ui/card";
 import { Separator } from "@shadcn/components/ui/separator";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@shadcn/components/ui/select";
 import { Upload, FileText, X, CheckCircle, Loader2, Download, RefreshCw, AlertCircle, TriangleAlertIcon, Check } from "lucide-react";
 import { ScrollArea } from "../shadcn/components/ui/scroll-area";
-import { useVideoConverter } from "../hooks/use-video-converter";
+import { useVideoConverter, OUTPUT_FORMATS } from "../hooks/use-video-converter";
 import { Alert, AlertDescription, AlertTitle } from "../shadcn/components/ui/alert";
 import { converterFeatures } from "../lib/features";
+
+const ACCEPTED_INPUT_FORMATS = 'video/mp4,video/quicktime,video/x-msvideo,video/x-matroska,video/webm,video/x-flv,video/x-ms-wmv,video/MP2T,video/3gpp,video/x-m4v,.mp4,.mov,.avi,.mkv,.webm,.flv,.wmv,.ts,.3gp,.m4v';
 
 export default function ConverterDropzone() {
   const {
@@ -19,6 +22,8 @@ export default function ConverterDropzone() {
     fileEntries,
     isConnected,
     toastMessage,
+    targetFormat,
+    setTargetFormat,
     handleFilesSelected,
     handleRemoveFile,
     handleUpload,
@@ -41,7 +46,6 @@ export default function ConverterDropzone() {
     if (files && files.length > 0) {
       handleFilesSelected(Array.from(files));
     }
-    // reset input
     if (filePickerRef.current) {
       filePickerRef.current.value = "";
     }
@@ -50,14 +54,12 @@ export default function ConverterDropzone() {
   const handleDragEnter = (event: React.DragEvent) => {
     event.preventDefault();
     event.stopPropagation();
-
     setIsDragging(true);
   };
 
   const handleDragLeave = (event: React.DragEvent) => {
     event.preventDefault();
     event.stopPropagation();
-
     setIsDragging(false);
   };
 
@@ -67,41 +69,36 @@ export default function ConverterDropzone() {
 
   const onDropFiles = (event: React.DragEvent) => {
     event.preventDefault();
-
     if (appState !== 'IDLE') return;
-
     const files = event.dataTransfer.files;
     if (files && files.length > 0) {
       handleFilesSelected(Array.from(files));
     }
   };
 
-  // derived lists
   const activeEntries = fileEntries.filter((f) => ['uploading', 'converting'].includes(f.status));
   const completedEntries = fileEntries.filter((f) => ['completed', 'downloaded', 'error'].includes(f.status));
 
   return (
     <div className="w-full flex flex-col gap-4">
-      {/* Toast Notification (Simple) */}
       {toastMessage && (
         <Alert variant={toastMessage.type === 'error' ? 'destructive' : 'success'} className='border-destructive'>
           {toastMessage.type === 'error' ? <AlertCircle className="size-6" /> : <CheckCircle className="size-6" />}
           <AlertTitle className="text-lg">{toastMessage.message}</AlertTitle>
-
         </Alert>
       )}
 
       {appState === 'IDLE' ? (
         <>
           <div className={`w-full h-full grid gap-4 ${selectedFiles.length > 0 ? ' grid-cols-1 lg:grid-cols-[1fr_1fr]' : 'grid-cols-1'}`}>
-            <div className="">
+            <div className="flex flex-col gap-3">
               <Card
                 id="converter-dropzone-card"
-                className={`group flex w-full h-full flex-col bg-transparent items-center justify-center gap-4 py-8 border-2 border-primary/50 border-dashed text-sm 
-                ${isDragging ? 'border-primary bg-primary/50 hover:bg-primary/50' : ''}
-                ${selectedFiles.length > 0 ? 'bg-primary/10' : ''}
-                ${!isConnected ? 'opacity-60 bg-muted/30 cursor-not-allowed border-muted-foreground/30' : 'cursor-pointer'}
-                transition-colors duration-300
+                className={`group flex w-full h-full flex-col bg-transparent items-center justify-center gap-4 py-8 border-2 border-border border-dashed text-sm
+                ${isDragging ? 'border-primary bg-primary/10' : ''}
+                ${selectedFiles.length > 0 ? 'bg-muted/30' : ''}
+                ${!isConnected ? 'opacity-60 bg-muted/20 cursor-not-allowed' : 'cursor-pointer hover:bg-muted/20 hover:border-primary/40'}
+                transition-colors duration-200
           `}
                 onDragEnter={isConnected ? handleDragEnter : undefined}
                 onDragLeave={isConnected ? handleDragLeave : undefined}
@@ -130,13 +127,14 @@ export default function ConverterDropzone() {
                       ref={filePickerRef}
                       type="file"
                       className="hidden"
-                      accept="video/quicktime,.mov"
+                      accept={ACCEPTED_INPUT_FORMATS}
                       multiple
                       onChange={onFileInputChange}
                       disabled={!isConnected}
                     />
-                    <span className="text-xs md:text-base text-muted-foreground/75 group-disabled:opacity-50 mt-2 block  text-center">
-                      Formatos permitidos: <b>MOV (max {converterFeatures.fileMaxSize} MB)</b><br />
+                    <span className="text-xs md:text-base text-muted-foreground/75 group-disabled:opacity-50 mt-2 block text-center">
+                      Entrada: <b>MP4, MOV, AVI, MKV, WebM, FLV, WMV y más</b><br />
+                      <span className="text-xs">Máx. {converterFeatures.fileMaxSize} MB por archivo</span>
                     </span>
                   </>
                 ) : (
@@ -149,7 +147,26 @@ export default function ConverterDropzone() {
                   </div>
                 )}
               </Card>
+
+              {isConnected && (
+                <div className="flex items-center gap-3">
+                  <span className="text-sm text-muted-foreground shrink-0">Convertir a:</span>
+                  <Select value={targetFormat} onValueChange={(v) => setTargetFormat(v as any)}>
+                    <SelectTrigger className="w-32">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {OUTPUT_FORMATS.map((fmt) => (
+                        <SelectItem key={fmt} value={fmt}>
+                          {fmt.toUpperCase()}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
             </div>
+
             {selectedFiles.length > 0 &&
               <div className="">
                 <div className="h-full flex flex-col gap-4">
@@ -161,7 +178,7 @@ export default function ConverterDropzone() {
                     <ScrollArea className="w-full max-h-[50dvh] md:max-h-[calc(100dvh-250px)]">
                       <div className="grid">
                         {selectedFiles.map((file, i) => <>
-                          <div key={`${file.name}-${i}`} className="p-3 px-4 border-b border-primary/15 overflow-hidden transition-colors duration-200 flex">
+                          <div key={`${file.name}-${i}`} className="p-3 px-4 border-b border-border overflow-hidden transition-colors duration-200 flex">
                             <div className="mr-2 grid shrink-0 place-content-center">
                               <FileText className="inline size-6" />
                             </div>
@@ -184,7 +201,7 @@ export default function ConverterDropzone() {
                     <Button size="lg" onClick={handleReset} variant="outline">Limpiar</Button>
                     <Button size="lg" onClick={handleUpload} disabled={!isConnected}>
                       <Upload className=" size-4" />
-                      Convertir
+                      Convertir a {targetFormat.toUpperCase()}
                     </Button>
                   </div>
                 </div>
@@ -194,7 +211,7 @@ export default function ConverterDropzone() {
         </>
       ) : (
         <div className="flex flex-col gap-y-4">
-          <div className="flex max-md:flex-col max-md:items-start gap-4 justify-between items-center bg-muted/30 p-4 border">
+          <div className="flex max-md:flex-col max-md:items-start gap-4 justify-between items-center bg-muted/40 p-4 rounded-md border border-border">
             <div className="flex flex-col gap-1">
               <span className="text-sm font-medium">Estado: {appState === 'UPLOADING' ? 'Subiendo...' : appState === 'CONVERTING' ? 'Convirtiendo...' : 'Finalizado'}</span>
               <span className="text-xs text-muted-foreground">{fileEntries.length} archivo(s) procesados.</span>
@@ -225,7 +242,7 @@ export default function ConverterDropzone() {
 
               <ScrollArea className="w-full max-h-[35dvh] md:max-h-[calc(100dvh-250px)]">
                 {activeEntries.map((file) => (
-                  <div key={file.id} className="p-3 px-4 border-b border-primary/15 overflow-hidden transition-colors duration-200 flex">
+                  <div key={file.id} className="p-3 px-4 border-b border-border overflow-hidden transition-colors duration-200 flex">
                     <div className="grid shrink-0 place-content-center">
                       <FileText className="inline size-6" />
                     </div>
@@ -249,7 +266,6 @@ export default function ConverterDropzone() {
             </div>
           )}
 
-
           {completedEntries.length > 0 && (
             <div className="flex flex-col gap-2">
               <h2 className="text-balance text-foreground flex items-center font-normal uppercase text-base">
@@ -258,7 +274,7 @@ export default function ConverterDropzone() {
               </h2>
               <ScrollArea className="w-full max-h-[50dvh] md:max-h-[calc(100dvh-250px)]">
                 {completedEntries.map((file) => <>
-                  <div key={file.id} className="p-3 px-4 border-b border-primary/15 overflow-hidden transition-colors duration-200 flex justify-between items-center">
+                  <div key={file.id} className="p-3 px-4 border-b border-border overflow-hidden transition-colors duration-200 flex justify-between items-center">
                     <div className="flex items-center gap-2">
                       <div className="grid shrink-0 place-content-center">
                         {file.status === 'error' ? <AlertCircle className="inline size-6 text-red-500" /> : <FileText className="inline size-6" />}
@@ -275,7 +291,6 @@ export default function ConverterDropzone() {
                         {file.status === 'error' ? (
                           <span className="text-xs text-red-500 mt-1">{file.error}</span>
                         ) : (
-
                           <span className="text-xs text-muted-foreground hover:underline cursor-pointer" onClick={() => handleDownload(file)}>
                             {file.downloadFilename}
                           </span>)}
